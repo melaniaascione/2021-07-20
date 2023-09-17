@@ -5,9 +5,11 @@
 package it.polito.tdp.yelp;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.yelp.model.Model;
+import it.polito.tdp.yelp.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -38,13 +40,13 @@ public class FXMLController {
     private TextField txtX2; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtN"
     private TextField txtN; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbUtente"
-    private ComboBox<?> cmbUtente; // Value injected by FXMLLoader
+    private ComboBox<User> cmbUtente; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX1"
     private TextField txtX1; // Value injected by FXMLLoader
@@ -54,12 +56,44 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	txtResult.clear();
+    
+    	//lettura del parametro
+    	int n = 0;
+    	int anno = 0;
+    	try {
+    		n = Integer.parseInt(this.txtN.getText());
+    		anno = this.cmbAnno.getValue();
+    	}
+    	catch(NumberFormatException e) {
+    		this.txtResult.setText("inserire un numero");
+    	}
+    	
+    	//creazione del grafo
+    	this.model.creaGrafo(n, anno);
 
+    	txtResult.appendText("Grafo creato con " + this.model.nVertici() + " vertici e " + this.model.nArchi() + " archi.");
+    	
+    	// Avendo creato il grafo, possiamo popolare le tendine
+    	cmbUtente.getItems().addAll(this.model.getVertici());
     }
 
     @FXML
     void doUtenteSimile(ActionEvent event) {
-
+    	User u = cmbUtente.getValue();
+    	
+    	if (u==null) {
+    		txtResult.setText("Devi selezionare un utente dopo avere creato il grafo\n");
+    		return;
+    	}
+    	
+    	List<User> vicini = model.utentiPiuSimili(u);
+    	
+    	txtResult.setText("Utenti più vicini a "+u+": \n\n");
+    	
+    	for(User u2: vicini) {
+    		txtResult.appendText(u2.toString()+"\n");
+    	}
     }
     
     @FXML
@@ -84,5 +118,14 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.cmbAnno.getItems().add(2005);
+    	this.cmbAnno.getItems().add(2006);
+    	this.cmbAnno.getItems().add(2007);
+    	this.cmbAnno.getItems().add(2008);
+    	this.cmbAnno.getItems().add(2009);
+    	this.cmbAnno.getItems().add(2010);
+    	this.cmbAnno.getItems().add(2011);
+    	this.cmbAnno.getItems().add(2012);
+    	this.cmbAnno.getItems().add(2013);
     }
 }
